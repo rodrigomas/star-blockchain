@@ -26,7 +26,7 @@ class Block {
     /**
      *  validate() method will validate if the block has been tampered or not.
      *  Been tampered means that someone from outside the application tried to change
-     *  values in the block data as a consecuence the hash of the block should be different.
+     *  values in the block data as a consequence the hash of the block should be different.
      *  Steps:
      *  1. Return a new promise to allow the method be called asynchronous.
      *  2. Save the in auxiliary variable the current hash of the block (`this` represent the block object)
@@ -35,17 +35,32 @@ class Block {
      *  5. Resolve true or false depending if it is valid or not.
      *  Note: to access the class values inside a Promise code you need to create an auxiliary value `let self = this;`
      */
-    validate() {
+    validate() 
+    {
         let self = this;
+
         return new Promise((resolve, reject) => {
             // Save in auxiliary variable the current block hash
-                                            
+
             // Recalculate the hash of the Block
             // Comparing if the hashes changed
             // Returning the Block is not valid
-            
+
             // Returning the Block is valid
 
+            // It is cloned because the block can be used for another process
+            let temp = self.clone();
+            temp.hash = null;
+            temp.hash = Block.computeHash(temp);                       
+
+            if (temp.hash == self.hash)
+            {
+                resolve(true);
+            }
+            else 
+            {
+                reject(false);
+            }                                        
         });
     }
 
@@ -65,8 +80,44 @@ class Block {
 
         // Resolve with the data if the object isn't the Genesis block
 
+        if(this.height == 0)
+        {
+            return null;
+        }
+
+        let data = JSON.parse(hex2ascii(this.body));
+
+        return data;
+
     }
 
+    /**
+     * Computes the block hash assuming the attributes are correct.
+     * 
+     * @param {Block} block Block you want to compute the Hash
+     * 
+     * @return Block sha256 hash
+     */
+    computeHash(block)
+    {
+        return SHA256(JSON.stringify(newBlock)).toString();
+    }
+
+    /**
+     * Clone the current block
+     */ 
+    clone() 
+    {
+        let block = new Block("");
+        block.height = this.height;
+        block.previousBlockHash = this.previousBlockHash;
+        block.time = this.time;
+        block.body = this.body;
+        block.hash = this.hash;
+
+        return block;
+
+    }
 }
 
 module.exports.Block = Block;                    // Exposing the Block class as a module
