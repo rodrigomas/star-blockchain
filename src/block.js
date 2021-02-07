@@ -100,7 +100,7 @@ class Block {
      */
     computeHash(block)
     {
-        return SHA256(JSON.stringify(newBlock)).toString();
+        return SHA256(JSON.stringify(block)).toString();
     }
 
     /**

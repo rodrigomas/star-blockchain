@@ -72,8 +72,8 @@ class Blockchain {
             {
                 block.previousBlockHash = self.chain[self.chain.length - 1].hash;
             }
-
-            block.hash = BlockClass.Block.computeHash(block);
+            
+            block.hash = block.computeHash(block);
 
             self.chain.push(block);
 
@@ -202,7 +202,7 @@ class Blockchain {
                
                 if(add == address)
                 {
-                    stars.push(message.star);
+                    stars.push({owner : address, star : message.star});
                 }
            }
 
