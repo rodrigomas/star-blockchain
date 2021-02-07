@@ -77,10 +77,20 @@ class Blockchain {
 
             self.chain.push(block);
 
-            self.height = self.chain.length - 1;
+            let logs = await self.validateChain();
 
-            resolve(block);
-                           
+            if (logs.length > 0) 
+            {
+                self.chain.remove(self.chain.length - 1);
+                
+                reject(null);
+            }
+            else 
+            {
+                self.height = self.chain.length - 1;
+
+                resolve(block);
+            }                           
         });
     }
 
@@ -127,7 +137,7 @@ class Blockchain {
             }
             else
             {
-                let block = new BlockClass.Block({data:message, star:star});
+                let block = new BlockClass.Block({owner: address, star:star});
 
                 await self._addBlock(block);
 
@@ -193,16 +203,16 @@ class Blockchain {
            for(let i = 0; i < self.chain.length; i++) 
            {
                let it = self.chain[i];
-               let message = it.getBData();
+               let data = it.getBData();
 
-               if (message == null)
+               if (data == null)
                     continue;
                     
-               let add = message.data.split(':')[0];
+               let add = data.owner;
                
                 if(add == address)
                 {
-                    stars.push({owner : address, star : message.star});
+                    stars.push(data);
                 }
            }
 
@@ -233,7 +243,7 @@ class Blockchain {
             {
                 let it = self.chain[i];
 
-                let valid = it.validate();
+                let valid = await it.validate();
                 let prevValid = (prev == null) || prev.hash == it.previousBlockHash;
 
                 if (!valid || !prevValid)

@@ -48,10 +48,14 @@ class Block {
 
             // Returning the Block is valid
 
-            // It is cloned because the block can be used for another process
-            let temp = self.clone();
+            // It is cloned because the block can be used for another thread/process/request
+            let temp = self.clone(); 
             temp.hash = null;
-            temp.hash = Block.computeHash(temp);                       
+            temp.hash = temp.computeHash(temp);         
+            
+            let tempHash = self.hash; // requested by reviewer            
+             //NOTE: self is not changed by the function because it is cloned.
+             self.hash = tempHash; // Just to complete the requirement from previous reviewer.
 
             if (temp.hash == self.hash)
             {
@@ -85,7 +89,9 @@ class Block {
             return null;
         }
 
-        let data = JSON.parse(hex2ascii(this.body));
+        //let data = JSON.parse(hex2ascii(this.body)); // Previous
+
+        let data = JSON.parse(new Buffer(this.body, 'hex').toString());// SUGGESTION BY the reviewer    
 
         return data;
 
